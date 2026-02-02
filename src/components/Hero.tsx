@@ -1,23 +1,8 @@
 export default function Hero() {
   return (
     <div className="relative min-h-[600px] bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 overflow-hidden">
-      {/* Navigation */}
-      <nav className="absolute top-0 w-full z-10">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center text-white">
-          <div className="text-2xl font-bold">GearMobile</div>
-          <div className="flex gap-6 text-sm">
-            <a href="#" className="hover:underline">Home</a>
-            <a href="#" className="hover:underline">Rent</a>
-            <a href="#" className="hover:underline">Rentals</a>
-            <a href="#" className="hover:underline">Learn More</a>
-            <a href="#" className="hover:underline">Messages</a>
-            <a href="#" className="hover:underline">Account</a>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Content */}
-      <div className="container mx-auto px-6 pt-32 pb-20 relative z-10">
+      <div className="container mx-auto px-6 pt-20 pb-20 relative z-10">
         <h1 className="text-6xl font-bold text-white mb-4">
           Let's get you<br />Connected!
         </h1>

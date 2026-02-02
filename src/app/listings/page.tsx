@@ -1,6 +1,6 @@
 import FilterSidebar from '@/components/listings/FilterSidebar'
 import ListingGrid from '@/components/listings/ListingGrid'
-import GoogleMapView from '@/components/listings/GoogleMapView'
+import LeafletMap from '@/components/listings/LeafletMap'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function ListingsPage() {
@@ -57,7 +57,7 @@ export default async function ListingsPage() {
 
           {/* Map View */}
           <div className="w-96 flex-shrink-0">
-            <GoogleMapView listings={listings || []} />
+            <LeafletMap listings={listings || []} />
           </div>
         </div>
       </div>

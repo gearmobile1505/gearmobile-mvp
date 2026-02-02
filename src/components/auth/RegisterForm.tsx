@@ -1,19 +1,44 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { signUp } from '@/lib/auth/actions'
 
 export default function RegisterForm() {
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(formData: FormData) {
+    setLoading(true)
+    setError(null)
+
+    if (!agreeTerms) {
+      setError('You must agree to the terms of service')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const result = await signUp(formData)
+      if (result?.error) {
+        setError(result.error)
+        setLoading(false)
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.')
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
       {/* Close Button */}
-      <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+      <Link href="/" className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </button>
+      </Link>
 
       {/* Logo */}
       <div className="flex justify-center mb-6">
@@ -30,20 +55,30 @@ export default function RegisterForm() {
 
       <h2 className="text-3xl font-bold text-center mb-6">Lets Get Started</h2>
 
-      <form className="space-y-4">
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+
+      <form action={handleSubmit} className="space-y-4">
         {/* Name Fields */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
             <input 
-              type="text" 
+              type="text"
+              name="firstName"
+              required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
             <input 
-              type="text" 
+              type="text"
+              name="lastName"
+              required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
             />
           </div>
@@ -51,12 +86,24 @@ export default function RegisterForm() {
 
         <p className="text-xs text-gray-500">Enter your name as it appears on your drivers lineense</p>
 
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input 
+            type="email"
+            name="email"
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+          />
+        </div>
+
         {/* Phone */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
           <div className="relative">
             <input 
-              type="tel" 
+              type="tel"
+              name="phone"
               className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
             />
             <svg className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +117,10 @@ export default function RegisterForm() {
           <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
           <div className="relative">
             <input 
-              type="password" 
+              type="password"
+              name="password"
+              required
+              minLength={6}
               className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
             />
             <svg className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,41 +130,53 @@ export default function RegisterForm() {
           </div>
         </div>
 
+        {/* User Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">I want to</label>
+          <select 
+            name="userType"
+            required
+            defaultValue=""
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-400 focus:border-transparent bg-white"
+          >
+            <option value="" disabled>Select an option</option>
+            <option value="customer">Rent tools</option>
+            <option value="renter">List my tools and earn money</option>
+            <option value="both">Both - rent and list tools</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">You can change this later in your account settings</p>
+        </div>
+
         {/* Toggles */}
         <div className="space-y-3 pt-2">
           <label className="flex items-center gap-3 cursor-pointer">
-            <div className="relative">
-              <input 
-                type="checkbox" 
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-cyan-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-400"></div>
-            </div>
+            <input 
+              type="checkbox"
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              className="w-5 h-5 text-cyan-400 rounded focus:ring-cyan-400"
+            />
             <span className="text-sm text-gray-700">I agree to the terms of service and privacy policy.</span>
           </label>
 
           <label className="flex items-center gap-3 cursor-pointer">
-            <div className="relative">
-              <input 
-                type="checkbox" 
-                checked={agreeMarketing}
-                onChange={(e) => setAgreeMarketing(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-cyan-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-400"></div>
-            </div>
-            <span className="text-sm text-gray-700">Yes, send me deals,discounts and Updates!</span>
+            <input 
+              type="checkbox"
+              checked={agreeMarketing}
+              onChange={(e) => setAgreeMarketing(e.target.checked)}
+              className="w-5 h-5 text-cyan-400 rounded focus:ring-cyan-400"
+            />
+            <span className="text-sm text-gray-700">Yes, send me deals, discounts and Updates!</span>
           </label>
         </div>
 
         {/* Sign Up Button */}
         <button 
           type="submit"
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white font-semibold py-3 rounded-lg transition mt-6"
+          disabled={loading}
+          className="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition mt-6"
         >
-          Sign Up
+          {loading ? 'Creating account...' : 'Sign Up'}
         </button>
 
         {/* Login Link */}
